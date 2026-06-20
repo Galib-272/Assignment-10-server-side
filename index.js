@@ -5,7 +5,7 @@ const connectDB = require("./config/db.js");
 
 const app = express();
 
-// Initialize Database Connection 
+// Initialize Database Connection
 connectDB();
 
 // Global Middleware Configs
@@ -20,5 +20,7 @@ app.get("/", (req, res) => {
 // Port Execution Configuration
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🔥 Express Application Node operational on port http://localhost:${PORT}`);
+  console.log(
+    `🔥 Express Application Node operational on port http://localhost:${PORT}`,
+  );
 });
