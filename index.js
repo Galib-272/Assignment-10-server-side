@@ -17,16 +17,16 @@ app.use(cors({
   credentials: true
 }));
 
-// --- BETTER-AUTH PASSTHROUGH (Sits before body-parsers to avoid stream locking) ---
+// --- BETTER-AUTH PASSTHROUGH (Must sit before body parsers to keep streams unlocked) ---
 app.use("/api/auth", (req, res, next) => {
   // If it's hitting your traditional manual local endpoints, skip Better-Auth
-  if (req.url === "/login" || req.url === "/register") {
+  if (req.path === "/login" || req.path === "/register") {
     return next();
   }
   return toNodeHandler(auth)(req, res);
 });
 
-// Standard Body Parsers
+// Standard Body Parsers (Safe down here)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
