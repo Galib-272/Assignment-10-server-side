@@ -6,11 +6,14 @@ const Ticket = require("../models/Ticket");
 // @desc    Create a new transport route ticket listing (Vendor Action)
 router.post("/create", async (req, res) => {
   try {
-    const { title, from, to, transportType, price, availableSeats, vendorId } = req.body;
+    const { title, from, to, transportType, price, availableSeats, vendorId } =
+      req.body;
 
     // Validation Check
     if (!title || !from || !to || !transportType || !price || !availableSeats) {
-      return res.status(400).json({ message: "All listing parameters are required." });
+      return res
+        .status(400)
+        .json({ message: "All listing parameters are required." });
     }
 
     // Instantiate a new Ticket document based on our Mongoose Model
@@ -22,13 +25,14 @@ router.post("/create", async (req, res) => {
       price,
       availableSeats,
       status: "Pending", // Requires Admin approval before going live
-      vendorId
+      vendorId,
     });
 
     // Save the ticket into your MongoDB Atlas cluster
     const savedTicket = await newTicket.save();
-    res.status(201).json({ message: "Ticket submitted successfully!", ticket: savedTicket });
-
+    res
+      .status(201)
+      .json({ message: "Ticket submitted successfully!", ticket: savedTicket });
   } catch (error) {
     console.error("Ticket Creation Error:", error);
     res.status(500).json({ message: "Server error failed to save ticket." });
@@ -44,7 +48,9 @@ router.get("/live", async (req, res) => {
     res.json(liveTickets);
   } catch (error) {
     console.error("Fetch Tickets Error:", error);
-    res.status(500).json({ message: "Server error failed to retrieve listings." });
+    res
+      .status(500)
+      .json({ message: "Server error failed to retrieve listings." });
   }
 });
 
