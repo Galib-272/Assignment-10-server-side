@@ -12,13 +12,17 @@ router.post("/register", async (req, res) => {
 
     // 1. Structural Validation
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Please fill out all required validation blocks." });
+      return res
+        .status(400)
+        .json({ message: "Please fill out all required validation blocks." });
     }
 
     // 2. Check if user credentials already exist in database storage
     let user = await User.findOne({ email: email.toLowerCase() });
     if (user) {
-      return res.status(400).json({ message: "This email address is already registered." });
+      return res
+        .status(400)
+        .json({ message: "This email address is already registered." });
     }
 
     // 3. Create fresh template instantiation
@@ -26,7 +30,7 @@ router.post("/register", async (req, res) => {
       name,
       email: email.toLowerCase(),
       password,
-      role: role || "User" // Defaults to normal passenger profile
+      role: role || "User", // Defaults to normal passenger profile
     });
 
     // 4. Encrypt password safety hash block
@@ -36,18 +40,22 @@ router.post("/register", async (req, res) => {
     // 5. Commit profile to MongoDB cluster
     await user.save();
 
-    // 6. Generate tracking access token 
+    // 6. Generate tracking access token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" } // Active session context valid for 7 days
+      { expiresIn: "7d" }, // Active session context valid for 7 days
     );
 
     res.status(201).json({
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
-
   } catch (error) {
     console.error("Registration Core Fault:", error);
     res.status(500).json({ message: "Server encountered a processing error." });
@@ -61,33 +69,43 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password inputs are mandatory." });
+      return res
+        .status(400)
+        .json({ message: "Email and password inputs are mandatory." });
     }
 
     // 1. Query for target identity matching profile
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(400).json({ message: "Invalid combination parameters entered." });
+      return res
+        .status(400)
+        .json({ message: "Invalid combination parameters entered." });
     }
 
     // 2. Compare user typed plaintext string against hashed store parameters
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid combination parameters entered." });
+      return res
+        .status(400)
+        .json({ message: "Invalid combination parameters entered." });
     }
 
     // 3. Sign fresh verification runtime context token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     res.json({
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
-
   } catch (error) {
     console.error("Login Core Fault:", error);
     res.status(500).json({ message: "Server encountered a processing error." });
