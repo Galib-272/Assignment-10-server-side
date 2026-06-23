@@ -13,17 +13,22 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// --- MOUNT ROUTE APP ENDPOINTS HERE ---
+// Mount Route App Endpoints
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/tickets", require("./routes/tickets")); // <-- ADD THIS LINE HERE
+app.use("/api/tickets", require("./routes/tickets"));
 
 // Root Validation Route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to TicketBari REST API Engine v1.0.0" });
+  res.json({ message: "Welcome to TicketBari REST API Engine running on Vercel Serverless!" });
 });
 
-// Port Execution Configuration
+// Port Execution Configuration (Needed for local development)
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🔥 Express Application Node operational on port http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🔥 Local testing active on port http://localhost:${PORT}`);
+  });
+}
+
+// CRITICAL FOR VERCEL SERVERLESS: Export the app module
+module.exports = app;
